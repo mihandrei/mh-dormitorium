@@ -14,7 +14,7 @@ public class <class>{
     <ftypes,fnames:{t,n| private final <t> <n>;
 }>
 
-    public <class>(<first(ftypes),first(fnames):{t,n|<t> <n>}><rest(ftypes),rest(fnames):{t,n|, <t> <n>}> ){
+    public <class>(<ftypes, fnames:{t,n|<t> <n>}; separator = ",">){
         <fnames:{n|this.<n> = <n>;
 }>
     }
@@ -31,9 +31,3 @@ public <type> get<Name>() {
 
 >>
 
-setterdef(type,name,Name) ::=<<
-public void set<Name>(<type> <name>) {
-    this.<name> = <name>;
-}
-
->>

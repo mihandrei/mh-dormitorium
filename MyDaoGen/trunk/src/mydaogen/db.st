@@ -1,6 +1,6 @@
 group db;
 
-dbdef(package,entitytype,table,types,cols,pktypes,pkcol) ::=<<
+dbdef(package,entitytype,table,types,cols,Cols,pktypes,pkcol) ::=<<
 package <package>;
 
 import java.sql.PreparedStatement;
@@ -15,6 +15,8 @@ public class <entitytype>DB {
     <query(...)>
 
     <getbypk(...)>
+    
+    <insert(...)>
 }
 >>
 
@@ -35,6 +37,7 @@ public List\<<entitytype>\> query(Connection con,String whereClause,Object ... a
 }>
             ret.add(new <entitytype>(<cols; separator=","> ));
         }
+        rs.close();
         return ret;
 }
 >>
@@ -43,6 +46,17 @@ getbypk(entitytype,pktypes,pkcol) ::=<<
 public <entitytype> getbypk(Connection con <pktypes,pkcol:{t,c|,<t> <c>}>)throws SQLException{
     String whereClause = "where <pkcol:{c|<c> = ?}>";
     return query(con,whereClause <pkcol:{c|,<c>}>).get(0);
+}
+>>
+
+insert(entitytype,table,types,cols,Cols) ::=<<
+public void insert(Connection con, <entitytype> r)throws SQLException{
+	PreparedStatement stm = con.prepareStatement("insert into <table>(<cols; separator = ",">) values (<cols:{c|?}; separator = ",">)");
+		
+	<cols, Cols:{c, C|stm.setObject(<i>, r.get<C>());
+}>
+	stm.executeUpdate();
+    
 }
 >>
 
