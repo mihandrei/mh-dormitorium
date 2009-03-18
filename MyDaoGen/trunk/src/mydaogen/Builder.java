@@ -9,10 +9,9 @@ import org.antlr.stringtemplate.StringTemplateGroup;
 
 public class Builder {
 
-    static String packageName = "mh.dao";
 
-    public static String buildClass(Table t) {
-        InputStream str = Main.class.getResourceAsStream("entity.st");
+    public static String buildClass(Table t, String packageName) {
+        InputStream str = Builder.class.getResourceAsStream("entity.st");
         StringTemplateGroup group = new StringTemplateGroup(new InputStreamReader(str));
 
         StringTemplate query = group.getInstanceOf("entitydef");
@@ -44,7 +43,7 @@ public class Builder {
         return query.toString();
     }
 
-    public static String buildDao(Table t) {
+    public static String buildDao(Table t, String packageName) {
         InputStream str = Main.class.getResourceAsStream("db.st");
         StringTemplateGroup group = new StringTemplateGroup(new InputStreamReader(str));
 
@@ -59,6 +58,7 @@ public class Builder {
             //ignoring imports for now
             query.setAttribute("types", type);
             query.setAttribute("cols", name);
+            query.setAttribute("Cols", capFirst(name));
         }
 
         for (String name : t.pk) {
@@ -78,3 +78,4 @@ public class Builder {
         return s.substring(0, 1).toUpperCase() + s.substring(1);
     }
 }
+
