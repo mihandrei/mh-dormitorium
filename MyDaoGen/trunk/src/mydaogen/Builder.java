@@ -2,80 +2,98 @@ package mydaogen;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
+
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
 public class Builder {
+	
+	private static StringTemplate load(String group,String template){
+		InputStream str = Builder.class.getResourceAsStream(group);
+		StringTemplateGroup templateGroup = new StringTemplateGroup(new InputStreamReader(str));
 
+		return templateGroup.getInstanceOf(template);
+	}
+	
+	/**
+	 *Fills in the template with the table meta data.
+	 */
+	private static void fillTemplate(StringTemplate template,TableInfo t, String packageName){
+		template.setAttribute("package", packageName);
 
-    public static String buildClass(Table t, String packageName) {
-        InputStream str = Builder.class.getResourceAsStream("entity.st");
-        StringTemplateGroup group = new StringTemplateGroup(new InputStreamReader(str));
+		template.setAttribute("table", t.name);
+		template.setAttribute("entitytype", entityName(t.name));
 
-        StringTemplate query = group.getInstanceOf("entitydef");
-        query.setAttribute("package", packageName);
+		Set<String> imports = new TreeSet<String>();
+		
+		for (ColumnInfo col : t.cols) {
+			template.setAttribute("cols", col.name); //the columns
+			template.setAttribute("fnames", col.name); //the coresponding field name
+			template.setAttribute("fNames", propertyName(col.name)); //and property
 
+			String[] ss = splitType(col.type);
+			String package_import = ss[0];
+			String type = ss[1];
 
-        query.setAttribute("class", capFirst(t.name));
+			template.setAttribute("ftypes", type);
 
-        Set<String> imports = new HashSet<String>();
-        for (String name : t.cols.keySet()) {
-            query.setAttribute("fnames", name);
-            query.setAttribute("fNames", capFirst(name));
+			if (!package_import.equals("java.lang")) {
+				imports.add(package_import);
+			}
+		}
+		
+		for (String name : t.pk) {
+			String type = splitType(t.getColumn(name).type)[1];
+			template.setAttribute("pktypes", type);
+			template.setAttribute("pkcols", name);
+			template.setAttribute("pknames", name);
+			template.setAttribute("pkNames", propertyName(name));
+		}
+		
+		for (String imp : imports) {
+			template.setAttribute("imports", imp);
+		}
+	}
 
-            String[] ss = splitType(t.cols.get(name));
-            String package_import = ss[0];
-            String type = ss[1];
+	public static String buildDao(TableInfo t, String packageName) {
+		StringTemplate template = 	load("db.st","dbdef");
+		fillTemplate(template, t, packageName);
+		return template.toString();
+	}
+	
+	public static String buildEntity(TableInfo t, String packageName) {
+		StringTemplate template = 	load("entity.st","entitydef");
+		fillTemplate(template, t, packageName);
+		return template.toString();
+	}
+	
+	public static String buildDaoFileName(String tname) {		
+		return entityName(tname) + "DB.java";
+	}
 
-            query.setAttribute("ftypes", type);
+	public static String buildEntityFileName(String tname) {
+		return entityName(tname) + ".java";
+	}
+	
+	private static String[] splitType(String s) {
+		int ldot = s.lastIndexOf(".");
+		return new String[] { s.substring(0, ldot), s.substring(ldot + 1) };
+	}
+	
+	/**
+	 * the entity name of a table name
+	 */
+	private static String entityName(String s) {
+		s = s.replace(" ", "_");
+		return s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
+	}
+	/**
+	 *property name of a column 
+	 */
+	private static String propertyName(String s){
+		return entityName(s);
+	}
 
-            if (!package_import.equals("java.lang")) {
-                imports.add(package_import);
-            }
-        }
-
-        for (String imp : imports) {
-            query.setAttribute("imports", imp);
-        }
-
-        return query.toString();
-    }
-
-    public static String buildDao(Table t, String packageName) {
-        InputStream str = Main.class.getResourceAsStream("db.st");
-        StringTemplateGroup group = new StringTemplateGroup(new InputStreamReader(str));
-
-        StringTemplate query = group.getInstanceOf("dbdef");
-        query.setAttribute("package", packageName);
-
-        query.setAttribute("table", t.name);
-        query.setAttribute("entitytype", capFirst(t.name));
-
-        for (String name : t.cols.keySet()) {
-            String type = splitType(t.cols.get(name))[1];
-            //ignoring imports for now
-            query.setAttribute("types", type);
-            query.setAttribute("cols", name);
-            query.setAttribute("Cols", capFirst(name));
-        }
-
-        for (String name : t.pk) {
-            String type = splitType(t.cols.get(name))[1];
-            query.setAttribute("pktypes", type);
-            query.setAttribute("pkcol", name);
-        }
-        return query.toString();
-    }
-
-    static String[] splitType(String s) {
-        int ldot = s.lastIndexOf(".");
-        return new String[]{s.substring(0, ldot), s.substring(ldot + 1)};
-    }
-
-    static String capFirst(String s) {
-        return s.substring(0, 1).toUpperCase() + s.substring(1);
-    }
 }
-

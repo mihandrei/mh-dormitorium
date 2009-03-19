@@ -5,16 +5,19 @@ import <imports> ;
 
 >>
 
-entitydef(package,imports,class,ftypes,fnames,fNames) ::=<<
+entitydef(package,imports,entitytype,table,
+		fnames,fNames,ftypes,
+		pknames,pkNames, pktypes,
+		cols,pkcols) ::=<<
 package <package> ;
 
 <imports:importdef()>
 
-public class <class>{
+public class <entitytype>{
     <ftypes,fnames:{t,n| private final <t> <n>;
 }>
 
-    public <class>(<ftypes, fnames:{t,n|<t> <n>}; separator = ",">){
+    public <entitytype>(<ftypes, fnames:{t,n|<t> <n>}; separator = ",">){
         <fnames:{n|this.<n> = <n>;
 }>
     }

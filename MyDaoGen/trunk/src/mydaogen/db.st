@@ -1,6 +1,9 @@
 group db;
 
-dbdef(package,entitytype,table,types,cols,Cols,pktypes,pkcol) ::=<<
+dbdef(package,entitytype,table,
+	  fnames,fNames,ftypes,
+	  pknames,pkNames, pktypes,
+	  cols,pkcols ) ::=<<
 package <package>;
 
 import java.sql.PreparedStatement;
@@ -17,11 +20,15 @@ public class <entitytype>DB {
     <getbypk(...)>
     
     <insert(...)>
+    
+    <update(...)>
+    
+    <updatepk(...)>
 }
 >>
 
 
-query(entitytype,table,types,cols) ::=<<
+query(entitytype,table,ftypes,cols) ::=<<
 
 public List\<<entitytype>\> query(Connection con,String whereClause,Object ... args)throws SQLException{
       PreparedStatement stm = con.prepareStatement("select * from <table> " +  whereClause);
@@ -33,30 +40,46 @@ public List\<<entitytype>\> query(Connection con,String whereClause,Object ... a
 
         List\<<entitytype>\> ret = new ArrayList\<<entitytype>\>();
         while (rs.next()) {
-            <types,cols:{t,c|<t> <c> =(<t>) rs.getObject("<c>");
+            <ftypes,fnames,cols:{t,n,c|<t> <n> =(<t>) rs.getObject("<c>");
 }>
-            ret.add(new <entitytype>(<cols; separator=","> ));
+            ret.add(new <entitytype>(<fnames; separator=","> ));
         }
         rs.close();
         return ret;
 }
 >>
 
-getbypk(entitytype,pktypes,pkcol) ::=<<
-public <entitytype> getbypk(Connection con <pktypes,pkcol:{t,c|,<t> <c>}>)throws SQLException{
-    String whereClause = "where <pkcol:{c|<c> = ?}>";
-    return query(con,whereClause <pkcol:{c|,<c>}>).get(0);
+getbypk(entitytype,pktypes,pknames,pkcols) ::=<<
+public <entitytype> getbypk(Connection con <pktypes,pknames:{t,n|,<t> <n>}>)throws SQLException{
+    String whereClause = "where <pkcols:{c|<c> = ?};separator = " and ">";
+    return query(con,whereClause <pknames:{n|,<n>}>).get(0);
 }
 >>
 
-insert(entitytype,table,types,cols,Cols) ::=<<
-public void insert(Connection con, <entitytype> r)throws SQLException{
+insert(entitytype,table,cols,fNames) ::=<<
+public void insert(Connection con, <entitytype> <table>)throws SQLException{
 	PreparedStatement stm = con.prepareStatement("insert into <table>(<cols; separator = ",">) values (<cols:{c|?}; separator = ",">)");
 		
-	<cols, Cols:{c, C|stm.setObject(<i>, r.get<C>());
+	<fNames:{N|stm.setObject(<i>, <table>.get<N>());
 }>
 	stm.executeUpdate();
     
 }
 >>
 
+update(table)::=<<
+public void update(Connection con, String setClause, Object... args) throws SQLException {
+	PreparedStatement stm = con.prepareStatement("update <table> " + setClause);
+	for (int i = 0; i \< args.length; i++) {
+		stm.setObject(i + 1, args[i]);
+	}
+	stm.executeUpdate();
+}
+>>
+
+updatepk(entitytype, table, pkcols, fNames, cols, pkNames)::=<<
+public void update(Connection con, <entitytype> <table>) throws SQLException{
+	String setClause = "set <cols:{c|<c> = ?}; separator = ","> where <pkcols:{c|<c> = ?};separator = " and ">";
+	update(con, setClause, <fNames:{N| <table>.get<N>()};separator = ",">,<pkNames:{N| <table>.get<N>()};separator = ",">);
+}
+>>
