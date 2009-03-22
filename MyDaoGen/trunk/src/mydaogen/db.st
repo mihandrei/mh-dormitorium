@@ -17,13 +17,17 @@ public class <entitytype>DB {
   
     <query(...)>
 
+    <if (pknames)>
     <getbypk(...)>
-    
+    <endif>
+
     <insert(...)>
     
     <update(...)>
-    
+
+    <if (pknames)>
     <updatepk(...)>
+    <endif>
 }
 >>
 
@@ -52,7 +56,12 @@ public List\<<entitytype>\> query(Connection con,String whereClause,Object ... a
 getbypk(entitytype,pktypes,pknames,pkcols) ::=<<
 public <entitytype> getbypk(Connection con <pktypes,pknames:{t,n|,<t> <n>}>)throws SQLException{
     String whereClause = "where <pkcols:{c|<c> = ?};separator = " and ">";
-    return query(con,whereClause <pknames:{n|,<n>}>).get(0);
+
+    List\<<entitytype>\> res = query(con,whereClause <pknames:{n|,<n>}>);
+    if(res.size() == 0)
+        return null;
+    else
+        return res.get(0);
 }
 >>
 

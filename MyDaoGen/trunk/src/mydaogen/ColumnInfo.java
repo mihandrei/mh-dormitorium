@@ -1,6 +1,6 @@
 package mydaogen;
 
-class ColumnInfo {
+public class ColumnInfo {
 
 	public final boolean autoinc;
 	public final String type;

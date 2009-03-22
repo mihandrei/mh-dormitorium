@@ -30,7 +30,7 @@ public class Builder {
 		
 		for (ColumnInfo col : t.cols) {
 			template.setAttribute("cols", col.name); //the columns
-			template.setAttribute("fnames", col.name); //the coresponding field name
+			template.setAttribute("fnames", col.name.toLowerCase()); //the coresponding field name
 			template.setAttribute("fNames", propertyName(col.name)); //and property
 
 			String[] ss = splitType(col.type);

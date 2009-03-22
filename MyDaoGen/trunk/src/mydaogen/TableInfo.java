@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * immutable table info
  */
-final class TableInfo {
+public final class TableInfo {
 
     public final List<ColumnInfo> cols;
     public final List<String> pk;
