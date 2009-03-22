@@ -29,16 +29,23 @@ public class Builder {
 		Set<String> imports = new TreeSet<String>();
 		
 		for (ColumnInfo col : t.cols) {
-			template.setAttribute("cols", col.name); //the columns
-			template.setAttribute("fnames", col.name.toLowerCase()); //the coresponding field name
-			template.setAttribute("fNames", propertyName(col.name)); //and property
-
 			String[] ss = splitType(col.type);
 			String package_import = ss[0];
 			String type = ss[1];
-
+			
+			template.setAttribute("cols", col.name); //the columns
+			template.setAttribute("fnames", col.name.toLowerCase()); //the coresponding field name
+			template.setAttribute("fNames", propertyName(col.name)); //and property
 			template.setAttribute("ftypes", type);
-
+			
+			if(col.autoinc){
+				template.setAttribute("fAutoinc", propertyName(col.name));
+				template.setAttribute("fautoinctype", type);
+			}else{ //not autoincrement columns
+				template.setAttribute("not_auto_cols", col.name); 
+				template.setAttribute("not_auto_fNames", propertyName(col.name)); 
+			}
+			
 			if (!package_import.equals("java.lang")) {
 				imports.add(package_import);
 			}
