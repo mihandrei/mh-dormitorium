@@ -71,19 +71,21 @@ insert(entitytype,table,not_auto_cols,fNames,not_auto_fNames,fAutoinc,fautoincty
 public <entitytype> insert(Connection con, <entitytype> <table>)throws SQLException{
 	String sql = "insert into <table>(<not_auto_cols; separator = ",">) values (<not_auto_cols:{c|?}; separator = ",">)";
 
-	PreparedStatement stm = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+	PreparedStatement stm = con.prepareStatement(sql <if (fAutoinc)>, Statement.RETURN_GENERATED_KEYS <endif>);
 		
 	<not_auto_fNames:{N|stm.setObject(<i>, <table>.get<N>());
 }>
 	stm.executeUpdate();
     
-    ResultSet rs = stm.getGeneratedKeys();
     
     <if (fAutoinc)>
-    	rs.next();
-    	return <table>.set<fAutoinc>((<fautoinctype>) rs.getObject(1));
+    ResultSet rs = stm.getGeneratedKeys();
+    rs.next();
+    <! hack ; assumes ever autoincr column is an integer; done because casting
+    to fautoinctype fails . ex: getobject returns long instead of the expected integer!>
+    return <table>.set<fAutoinc>(rs.getInt(1));
     <else>	
-    	return <table>;
+    return <table>;
     <endif>
      
 }
