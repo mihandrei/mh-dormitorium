@@ -3,7 +3,7 @@
 #include <time.h>
 #include <GL/gl.h>
 
-#include "mesh.h"
+#include "../shared/mesh.h"
 #include "PointSource.h"
 #include "../wavesAnimation.h"
 

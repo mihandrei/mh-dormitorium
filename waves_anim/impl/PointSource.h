@@ -1,8 +1,8 @@
 #ifndef POINTSOURCE_H_
 #define POINTSOURCE_H_
 
-#include "math3d.h"
-#include "mesh.h"
+#include "../shared/math3d.h"
+#include "../shared/mesh.h"
 
 /*
  *a point wave centered in the origin

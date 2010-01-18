@@ -1,8 +1,8 @@
 #include <GL/gl.h>
 #include <stdlib.h>
-#include "math3d.h"
+#include "../shared/math3d.h"
 
-#include "../common-geometry.h"
+#include "common-geometry.h"
 
 // Array containing the six vertices of the cube
 static const GLfloat cube_corners[] = { -1.0f, 1.0f, 1.0f, // 0 // Front of cube

@@ -11,6 +11,7 @@ typedef struct {
 	Vector3 *pVerts;
 	Vector3 *pNorms;
 	Vector3 *pColor;
+	Vector2 *pTexCoords;
 	unsigned short nindexes;
 	unsigned short nverts;
 	unsigned int nMaxIndexes;// immutable
