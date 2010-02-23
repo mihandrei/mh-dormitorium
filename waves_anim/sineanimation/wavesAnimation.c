@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <time.h>
 #include <GL/gl.h>
 
-#include "../shared/mesh.h"
 #include "PointSource.h"
-#include "../wavesAnimation.h"
+#include "wavesAnimation.h"
 
 static short NSOURCES;
 static short SAMPLES;
@@ -61,13 +61,14 @@ bool wavesAnimation_toggle_cache(){
 		return cache;
 }
 
-void wavesAnimation___init__(short nsources, short samples){
+void wavesAnimation___init__(short nsources, short samples,
+		bool usenormals,bool usecolor,bool gentexcoords,int colortype){
 	NSOURCES = nsources;
 	SAMPLES = samples;
 
 	srand(time(NULL));
 	sources =  malloc(sizeof(CachingSource)* NSOURCES);
-	parammesh = parametricmesh__init__(SAMPLES, 1);
+	parammesh = parametricmesh__init__(SAMPLES, 1, usenormals, usecolor, gentexcoords,colortype);
 
 	CachingSources__init__(sources, NSOURCES, parammesh);
 	ctxt.nsources = NSOURCES;

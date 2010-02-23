@@ -11,11 +11,13 @@
 #define BR_LIGHT_ALL_AND_TEX 4
 #define BR_LIGHT_ENUMLEN 5
 
+#define WRONG_TRANSPARENCY 0
 
 void RenderScene(void);
 void ChangeSize(GLsizei w, GLsizei h);
-void SetupRC(void);
+void SetupRC(bool usenormals, bool usecolor, bool gentexcoords);
 void SetupLight(int lighting);
 
 void RenderStatusLine();
 void drawGeometry();
+void glerr(char* source);

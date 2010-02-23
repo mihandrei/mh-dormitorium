@@ -1,8 +1,8 @@
 #ifndef POINTSOURCE_H_
 #define POINTSOURCE_H_
 
-#include "../shared/math3d.h"
-#include "../shared/mesh.h"
+#include "../math/math3d.h"
+#include "parametricmesh.h"
 
 /*
  *a point wave centered in the origin
@@ -35,6 +35,7 @@ void CachingSource__init__(CachingSource *self, const parametricmesh* pm ,
 		float x0, float y0, float A0, float freq, float speed, float phase0, float damping_coeff);
 void CachingSource__dispose(CachingSource *self);
 void CachingSources__dispose__(CachingSource* sources, short nsources);
+
 typedef struct{
 	CachingSource *sources;
 	short nsources;
@@ -45,7 +46,8 @@ void randPointSources(PointSource *sources, short nsources);
 void CachingSources__init__(CachingSource* sources, short nsources,const parametricmesh *pm);
 
 void waves_spatial_cache(float s, float t, void *context,Vector3 result,int sidx,int tidx) ;
-void waves_no_cache(float s, float t, void *context,Vector3 result,int sidx,int tidx) ;
+void waves_no_cache     (float s, float t, void *context,Vector3 result,int sidx,int tidx) ;
+
 void viewspatial(float s, float t, void *ctxt, Vector3 result,
 		int sidx, int tidx);
 
