@@ -31,7 +31,7 @@ void PhysSurf__init(PhysSurf *self, VertexMatrix *vm, float d, float t,
 	self->vm = vm;
 	int count = vm->w * vm->h;
 	self->prevbuffer = (Vector3*) malloc(sizeof(Vector3) * count);
-	memcpy(self->prevbuffer,vm->vertices,sizeof(Vector3) * count);
+	memcpy(self->prevbuffer, vm->vertices, sizeof(Vector3) * count);
 
 	float c1 = c * c * t * t / (d * d);
 	float c2 = 1.0f / (mu * t + 2);
@@ -47,7 +47,7 @@ void PhysSurf__dispose(PhysSurf *self) {
 
 void PhysSurf_eval(PhysSurf *self) {
 	//apply 13.25 from maths for 3d prog ...
-	VertexMatrix *const vm = self->vm;
+	VertexMatrix * const vm = self->vm;
 	const int w = vm->w;
 	const int h = vm->h;
 
@@ -76,17 +76,17 @@ void PhysSurf_eval(PhysSurf *self) {
 		Vector3 *crnt = &vm->vertices[hi * w];
 
 		for (long wi = 1; wi < w - 1; wi++) {
-			LoadVector3(vm->normals[hi * w + wi], crnt[wi - 1][2] - crnt[wi
-					+ 1][2], crnt[wi - w][2] - crnt[wi + w][2], 1);
+			LoadVector3(vm->normals[hi * w + wi], crnt[wi - 1][2]
+					- crnt[wi + 1][2], crnt[wi - w][2] - crnt[wi + w][2], 1);
 			NormalizeVector(vm->normals[hi * w + wi]);
 		}
 	}
 }
 
-void PhysSurf_deform(PhysSurf *self, int x, int y, int pulse_w, int pulse_h,
-		float A, const float pulse[], int additive) {
-	x -= pulse_w / 2;
-	y -= pulse_h / 2;
+void PhysSurf_deform(PhysSurf *self, int x, int y, float A, const Pulse *pulse,
+		int additive) {
+	x -= pulse->w / 2;
+	y -= pulse->h / 2;
 
 	int w = self->vm->w;
 
@@ -94,16 +94,72 @@ void PhysSurf_deform(PhysSurf *self, int x, int y, int pulse_w, int pulse_h,
 
 	for (int b = 0; b < 2; b++) {
 		Vector3* buff = buffs[b];
-		for (int hi = 0; hi < pulse_h; hi++) {
-			for (int wi = 0; wi < pulse_w; wi++) {
+		for (int hi = 0; hi < pulse->h; hi++) {
+			for (int wi = 0; wi < pulse->w; wi++) {
 				int a = (x + hi) * w + y + wi;
-				float ampl = A * pulse[hi * pulse_w + wi];
+				float ampl = A * pulse->ph[hi * pulse->w + wi];
 				if (additive) {
 					buff[a][2] += ampl;
 				} else {
 					buff[a][2] = ampl;
 				}
 			}
+		}
+	}
+}
+
+float conepulse(float s, float t) {
+	float r = sqrt(s * s + t * t);
+	if (r < 1)
+		return 1 - r;
+	else
+		return 0;
+}
+
+float spherepulse(float s, float t) {
+	float r2 = s * s + t * t;
+	if (r2 < 1)
+		return sqrt(1 - r2);
+	else
+		return 0;
+}
+
+float cosinepulse(float s, float t) {
+	float r = sqrt(s * s + t * t);
+	if (r < 1)
+		return cos(r*PI/2);
+	else
+		return 0;
+}
+
+float rectpulse(float s, float t) {
+	return 1;
+}
+float planepulse(float s, float t) {
+	return s + t;
+}
+
+void Pulse__init(Pulse *self, int w, int h) {
+	self->w = w;
+	self->h = h;
+	self->ph = malloc(sizeof(float) * w * h);
+}
+
+void Pulse__dispose(Pulse *self) {
+	free(self->ph);
+}
+
+void Pulse_init_fromfn(Pulse *self, int w, int h, pulsefn func) {
+	Pulse__init(self, w, h);
+
+	for (int hi = 0; hi < self->h; hi++) {
+		float h = 2 * hi / (float) self->h - 1;
+
+		for (int wi = 0; wi < self->w; wi++) {
+			float t = 2 * wi / (float) self->w - 1;
+
+			self->ph[hi * self->w + wi] = func(h, t);
+
 		}
 	}
 }
