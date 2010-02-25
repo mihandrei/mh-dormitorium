@@ -7,10 +7,13 @@
  * Doar valorile vecinilor din pasul curent conteaza.
  */
 /**
- * verifica ca bufferele sa fie consistente:
- * 0 1 2 3 ->y ; 3=w
+ * TODO: verifica ca bufferele sa fie consistente:
+ * 0 1 2 3 ->y ; 3=w    y +-1 => buff +-1  ;x+=1 =>buff +-w
  * 4 5 6 7
  * x
+ *
+ * TODO fix normals. more than numerical stability.
+ * after 2 iterations normals are too vertical eveen if surface is an aabrupt gaussian
  * */
 
 int PhysSurf_checkstability(float d, float t, float c, float mu) {
@@ -38,6 +41,7 @@ void PhysSurf__init(PhysSurf *self, VertexMatrix *vm, float d, float t,
 	self->k1 = (4.0f - 8.0f * c1) * c2;
 	self->k2 = (mu * t - 2) * c2;
 	self->k3 = 2.0f * c1 * c2;
+	self->d = d;
 
 }
 
@@ -51,6 +55,7 @@ void PhysSurf_eval(PhysSurf *self) {
 	const int w = vm->w;
 	const int h = vm->h;
 
+
 	for (int hi = 1; hi < h - 1; hi++) {
 		//current rows in both buffers
 		Vector3 *crnt = &vm->vertices[hi * w];
@@ -58,8 +63,8 @@ void PhysSurf_eval(PhysSurf *self) {
 
 		for (int wi = 1; wi < w - 1; wi++) {
 			float nextz = self->k1 * crnt[wi][2] + self->k2 * prev[wi][2];
-			nextz += self->k3 * (crnt[wi + 1][2] + crnt[wi - 1][2] + crnt[wi
-					+ w][2] + crnt[wi - w][2]);
+			nextz += self->k3 * (crnt[wi + w][2] + crnt[wi - w][2] + crnt[wi
+					+ 1][2] + crnt[wi - 1][2]);
 
 			prev[wi][2] = nextz;
 		}
@@ -72,40 +77,46 @@ void PhysSurf_eval(PhysSurf *self) {
 
 	//compute normals
 
-	for (long hi = 1; hi < h - 1; hi++) {
+	for (int hi = 1; hi < h - 1; hi++) {
 		Vector3 *crnt = &vm->vertices[hi * w];
+		Vector3 *crnt_norms = &vm->normals[hi * w];
 
-		for (long wi = 1; wi < w - 1; wi++) {
-			LoadVector3(vm->normals[hi * w + wi], crnt[wi - 1][2]
-					- crnt[wi + 1][2], crnt[wi - w][2] - crnt[wi + w][2], 1);
-			NormalizeVector(vm->normals[hi * w + wi]);
+		//TODO address numerical instability: these differences become 0 =>vertically biased normals
+		for (int wi = 1; wi < w - 1; wi++) {
+			LoadVector3(crnt_norms[wi], crnt[wi - w][2] - crnt[wi + w][2],
+					crnt[wi - 1][2] - crnt[wi + 1][2] , 2*self->d);
+			NormalizeVector(crnt_norms[wi]);
 		}
 	}
 }
 
-void PhysSurf_deform(PhysSurf *self, int x, int y, float A, const Pulse *pulse,
-		int additive) {
+static void PhysSurf_puls2buff(PhysSurf *self, int bufferidx, int x, int y,
+		float A, const Pulse *pulse, int additive) {
 	x -= pulse->w / 2;
 	y -= pulse->h / 2;
 
 	int w = self->vm->w;
 
 	Vector3 *buffs[] = { self->vm->vertices, self->prevbuffer };
+	Vector3 *buff = buffs[bufferidx];
 
-	for (int b = 0; b < 2; b++) {
-		Vector3* buff = buffs[b];
-		for (int hi = 0; hi < pulse->h; hi++) {
-			for (int wi = 0; wi < pulse->w; wi++) {
-				int a = (x + hi) * w + y + wi;
-				float ampl = A * pulse->ph[hi * pulse->w + wi];
-				if (additive) {
-					buff[a][2] += ampl;
-				} else {
-					buff[a][2] = ampl;
-				}
+	for (int hi = 0; hi < pulse->h; hi++) {
+		for (int wi = 0; wi < pulse->w; wi++) {
+			int a = (x + hi) * w + y + wi;
+			float ampl = A * pulse->ph[hi * pulse->w + wi];
+			if (additive) {
+				buff[a][2] += ampl;
+			} else {
+				buff[a][2] = ampl;
 			}
 		}
 	}
+}
+
+void PhysSurf_deform(PhysSurf *self, int x, int y, float A, const Pulse *pulse,
+		const Pulse *prevpulse, int additive) {
+	PhysSurf_puls2buff(self, 0, x, y, A, pulse, additive);
+	PhysSurf_puls2buff(self, 1, x, y, A, prevpulse, additive);
 }
 
 float conepulse(float s, float t) {
@@ -127,16 +138,25 @@ float spherepulse(float s, float t) {
 float cosinepulse(float s, float t) {
 	float r = sqrt(s * s + t * t);
 	if (r < 1)
-		return cos(r*PI/2);
+		return cos(r * PI / 2);
 	else
 		return 0;
+}
+
+float gauss(float s, float t) {
+	const float c = 0.2f;
+
+	float r2 = s * s + t * t;
+	float a = 1/(c * sqrt(2*PI));
+	float gauss =  a* exp(-r2 / (2*c*c) );
+	return gauss;
 }
 
 float rectpulse(float s, float t) {
 	return 1;
 }
 float planepulse(float s, float t) {
-	return s + t;
+	return (s + 1) / 2.0;
 }
 
 void Pulse__init(Pulse *self, int w, int h) {
@@ -163,3 +183,5 @@ void Pulse_init_fromfn(Pulse *self, int w, int h, pulsefn func) {
 		}
 	}
 }
+
+

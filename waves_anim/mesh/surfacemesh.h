@@ -1,6 +1,7 @@
 #ifndef SURFACEMESH_H_
 #define SURFACEMESH_H_
 #include "../math/math3d.h"
+#define DEBUG_NORMALS
 
 //a rectangular grid of vertices and their normals
 typedef struct{
@@ -23,6 +24,7 @@ typedef struct {
 
 void SurfaceMesh_initVertices(VertexMatrix* vm, float d);
 void SurfaceMesh__dispose(SurfaceMesh *self);
+void SurfaceMesh__drawnormals(SurfaceMesh *self);
 
 void SimetricTriangleMesh__init(SurfaceMesh *self, VertexMatrix* vm, float d);
 //need vertex array and normal array enabled
