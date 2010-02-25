@@ -31,15 +31,14 @@ void PhysSurf_deform(PhysSurf *self, int x, int y, float A, const Pulse *pulse,
 		const Pulse *prevpulse, int additive);
 
 //s t  -1 .. 1
-typedef float pulsefn(float s, float t);
-float conepulse(float s, float t);
-float rectpulse(float s, float t);
-float planepulse(float s, float t);
-float spherepulse(float s, float t);
-float cosinepulse(float s, float t);
-float gauss(float s, float t);
+typedef float pulsefn(float s, float t,void *data);
+
+float Pulse_sphere(float s, float t,void *data);
+float Pulse_rect(float s, float t,void *data);
+float Pulse_gauss(float s, float t,float *c);
+float Pulse_modes(float s, float t,int mn_array[2]);
 
 void Pulse__init(Pulse *self, int w, int h);
-void Pulse_init_fromfn(Pulse *self, int w, int h, pulsefn func);
+void Pulse_init_fromfn(Pulse *self, int w, int h, pulsefn func,void *data);
 void Pulse__dispose(Pulse *self);
 #endif /* SURFACEPHYSICS_H_ */

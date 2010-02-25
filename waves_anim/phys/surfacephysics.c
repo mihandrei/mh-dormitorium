@@ -7,13 +7,10 @@
  * Doar valorile vecinilor din pasul curent conteaza.
  */
 /**
- * TODO: verifica ca bufferele sa fie consistente:
+ * bufferele sa fie consistente:
  * 0 1 2 3 ->y ; 3=w    y +-1 => buff +-1  ;x+=1 =>buff +-w
  * 4 5 6 7
  * x
- *
- * TODO fix normals. more than numerical stability.
- * after 2 iterations normals are too vertical eveen if surface is an aabrupt gaussian
  * */
 
 int PhysSurf_checkstability(float d, float t, float c, float mu) {
@@ -81,7 +78,6 @@ void PhysSurf_eval(PhysSurf *self) {
 		Vector3 *crnt = &vm->vertices[hi * w];
 		Vector3 *crnt_norms = &vm->normals[hi * w];
 
-		//TODO address numerical instability: these differences become 0 =>vertically biased normals
 		for (int wi = 1; wi < w - 1; wi++) {
 			LoadVector3(crnt_norms[wi], crnt[wi - w][2] - crnt[wi + w][2],
 					crnt[wi - 1][2] - crnt[wi + 1][2] , 2*self->d);
@@ -118,70 +114,3 @@ void PhysSurf_deform(PhysSurf *self, int x, int y, float A, const Pulse *pulse,
 	PhysSurf_puls2buff(self, 0, x, y, A, pulse, additive);
 	PhysSurf_puls2buff(self, 1, x, y, A, prevpulse, additive);
 }
-
-float conepulse(float s, float t) {
-	float r = sqrt(s * s + t * t);
-	if (r < 1)
-		return 1 - r;
-	else
-		return 0;
-}
-
-float spherepulse(float s, float t) {
-	float r2 = s * s + t * t;
-	if (r2 < 1)
-		return sqrt(1 - r2);
-	else
-		return 0;
-}
-
-float cosinepulse(float s, float t) {
-	float r = sqrt(s * s + t * t);
-	if (r < 1)
-		return cos(r * PI / 2);
-	else
-		return 0;
-}
-
-float gauss(float s, float t) {
-	const float c = 0.2f;
-
-	float r2 = s * s + t * t;
-	float a = 1/(c * sqrt(2*PI));
-	float gauss =  a* exp(-r2 / (2*c*c) );
-	return gauss;
-}
-
-float rectpulse(float s, float t) {
-	return 1;
-}
-float planepulse(float s, float t) {
-	return (s + 1) / 2.0;
-}
-
-void Pulse__init(Pulse *self, int w, int h) {
-	self->w = w;
-	self->h = h;
-	self->ph = malloc(sizeof(float) * w * h);
-}
-
-void Pulse__dispose(Pulse *self) {
-	free(self->ph);
-}
-
-void Pulse_init_fromfn(Pulse *self, int w, int h, pulsefn func) {
-	Pulse__init(self, w, h);
-
-	for (int hi = 0; hi < self->h; hi++) {
-		float h = 2 * hi / (float) self->h - 1;
-
-		for (int wi = 0; wi < self->w; wi++) {
-			float t = 2 * wi / (float) self->w - 1;
-
-			self->ph[hi * self->w + wi] = func(h, t);
-
-		}
-	}
-}
-
-
