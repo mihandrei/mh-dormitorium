@@ -88,8 +88,6 @@ void PhysSurf_eval(PhysSurf *self) {
 
 static void PhysSurf_puls2buff(PhysSurf *self, int bufferidx, int x, int y,
 		float A, const Pulse *pulse, int additive) {
-	x -= pulse->w / 2;
-	y -= pulse->h / 2;
 
 	int w = self->vm->w;
 

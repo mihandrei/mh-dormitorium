@@ -15,10 +15,10 @@ void Pulse_init_fromfn(Pulse *self, int w, int h, pulsefn func,void *data) {
 	Pulse__init(self, w, h);
 
 	for (int hi = 0; hi < self->h; hi++) {
-		float h = 2 * hi / (float) self->h - 1;
+		float h = 2 * hi / (self->h - 1.0f) -1;
 
 		for (int wi = 0; wi < self->w; wi++) {
-			float t = 2 * wi / (float) self->w - 1;
+			float t = 2 * wi / (self->w - 1.0f) -1;
 
 			self->ph[hi * self->w + wi] = func(h, t,data);
 

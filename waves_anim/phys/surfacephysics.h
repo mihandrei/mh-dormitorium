@@ -24,7 +24,7 @@ typedef struct {
 	int w, h;
 } Pulse;
 
-//deforms the surface  around x,y with the given pulse,
+//deforms the surface with the given pulse, x,y specify where the pulse should be copied, not centered!
 //prevpulse specify the shape of the pulse at t-dt, use to specify speed
 //no bounds check
 void PhysSurf_deform(PhysSurf *self, int x, int y, float A, const Pulse *pulse,
