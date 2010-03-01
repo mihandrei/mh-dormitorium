@@ -52,7 +52,6 @@ void PhysSurf_eval(PhysSurf *self) {
 	const int w = vm->w;
 	const int h = vm->h;
 
-
 	for (int hi = 1; hi < h - 1; hi++) {
 		//current rows in both buffers
 		Vector3 *crnt = &vm->vertices[hi * w];
@@ -80,24 +79,25 @@ void PhysSurf_eval(PhysSurf *self) {
 
 		for (int wi = 1; wi < w - 1; wi++) {
 			LoadVector3(crnt_norms[wi], crnt[wi - w][2] - crnt[wi + w][2],
-					crnt[wi - 1][2] - crnt[wi + 1][2] , 2*self->d);
+					crnt[wi - 1][2] - crnt[wi + 1][2], 2 * self->d);
 			NormalizeVector(crnt_norms[wi]);
 		}
 	}
 }
 
-static void PhysSurf_puls2buff(PhysSurf *self, int bufferidx, int x, int y,
-		float A, const Pulse *pulse, int additive) {
+static void PhysSurf_puls2buff(PhysSurf *self, Vector3 *const buff, int x, int y,
+		const Pulse *pulse, int additive) {
 
-	int w = self->vm->w;
+	const int w = self->vm->w;
 
-	Vector3 *buffs[] = { self->vm->vertices, self->prevbuffer };
-	Vector3 *buff = buffs[bufferidx];
+	const int maxp =pulse->w > pulse->h ? pulse->w : pulse->h;
+
+	float scaleampl = maxp*self->d/2;
 
 	for (int hi = 0; hi < pulse->h; hi++) {
 		for (int wi = 0; wi < pulse->w; wi++) {
 			int a = (x + hi) * w + y + wi;
-			float ampl = A * pulse->ph[hi * pulse->w + wi];
+			float ampl = scaleampl * pulse->ph[hi * pulse->w + wi];
 			if (additive) {
 				buff[a][2] += ampl;
 			} else {
@@ -107,8 +107,8 @@ static void PhysSurf_puls2buff(PhysSurf *self, int bufferidx, int x, int y,
 	}
 }
 
-void PhysSurf_deform(PhysSurf *self, int x, int y, float A, const Pulse *pulse,
+void PhysSurf_deform(PhysSurf *self, int x, int y, const Pulse *pulse,
 		const Pulse *prevpulse, int additive) {
-	PhysSurf_puls2buff(self, 0, x, y, A, pulse, additive);
-	PhysSurf_puls2buff(self, 1, x, y, A, prevpulse, additive);
+	PhysSurf_puls2buff(self, self->vm->vertices, x, y, pulse, additive);
+	PhysSurf_puls2buff(self, self->prevbuffer  , x, y, prevpulse, additive);
 }

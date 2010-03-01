@@ -18,6 +18,5 @@ void ChangeSize(GLsizei w, GLsizei h);
 void SetupRC(bool usenormals, bool usecolor, bool gentexcoords);
 void SetupLight(int lighting);
 
-void RenderStatusLine();
 void drawGeometry();
 void glerr(char* source);

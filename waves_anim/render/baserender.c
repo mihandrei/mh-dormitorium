@@ -9,7 +9,7 @@
 #include "tga.h"
 
 extern float xRot, zRot;
-extern bool wires, renderplane;
+extern bool wires;
 
 float light0_pos[] = { 0, 0, 0, 1.0 };
 float lightdirection[] = { 0, 0, -1, 1.0 };
@@ -24,7 +24,7 @@ void glerr(char* source) {
 
 static void light() {
 	//light
-	glLightfv(GL_LIGHT0,GL_SPOT_DIRECTION,lightdirection);
+	glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, lightdirection);
 	glColor3f(1.0, 1.0, 0.5);
 	glBegin(GL_LINES);
 	glVertex3fv(light0_pos);
@@ -34,17 +34,42 @@ static void light() {
 	glLightfv(GL_LIGHT0, GL_POSITION, light0_pos);
 }
 
-void RenderScene(void) {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	glDisable(GL_COLOR_ARRAY);
+static void RenderOverlay() {
 	bool lighting = glIsEnabled(GL_LIGHTING);
 	bool tex = glIsEnabled(GL_TEXTURE_2D);
 	glDisable(GL_LIGHTING);
 	glDisable(GL_TEXTURE_2D);
-	glColor3f(0.5, 0.5, 0.5);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR);
+	glDepthMask(GL_FALSE);
 
-	RenderStatusLine();
+	glColor3f(0, 0, 1);
+
+	glPushMatrix();
+	glTranslatef(0,0,-0.6);
+	glScalef(0.1,0.1,1);
+
+	glBegin(GL_QUADS);
+	glVertex3f(-1, -1,0);
+	glVertex3f(-1, 1,0);
+	glVertex3f(1, 1,0);
+	glVertex3f(1, -1,0);
+	glEnd();
+
+	glPopMatrix();
+
+	glDepthMask(GL_TRUE);
+	glDisable(GL_BLEND);
+	if (lighting)
+		glEnable(GL_LIGHTING);
+	if (tex)
+		glEnable(GL_TEXTURE_2D);
+}
+
+void RenderScene(void) {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glColor3f(0.5, 0.5, 0.5);
 
 	glPushMatrix();
 	//eye space light
@@ -52,20 +77,8 @@ void RenderScene(void) {
 
 	//push origin forward along z so that we can see it
 	glTranslatef(0, 0, -4);
-
-	glRotatef(xRot - 80, 1.0f, 0.0f, 0.0f);
+	glRotatef(xRot - 50, 1.0f, 0.0f, 0.0f);
 	glRotatef(zRot - 135, 0.0f, 0.0f, 1.0f);
-
-	//wirecube();
-
-	if (lighting) {
-		glEnable(GL_LIGHTING);
-	}
-	if(tex){
-		glEnable(GL_TEXTURE_2D);
-	}
-
-	///////
 
 	if (wires) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -76,6 +89,8 @@ void RenderScene(void) {
 	drawGeometry();
 
 	glPopMatrix();
+
+//	RenderOverlay();
 }
 
 void ChangeSize(GLsizei w, GLsizei h) {
@@ -120,7 +135,7 @@ void SetupRC(bool usenormals, bool usecolor, bool gentexcoords) {
 	static float moonlight = 0.7;
 	float ambientLight[] = { 1 - moonlight, 1 - moonlight, 1 - moonlight, 1.0 };
 	float diffuseLight[] = { moonlight, moonlight, moonlight, 1.0 };
-	float fogcolor[] = { 0,0,0};
+	float fogcolor[] = { 0, 0, 0 };
 	float specularLight[] = { 1.0, 1.0, 1.0, 1.0 };
 	float specref[] = { 0.4, 0.4, 0.4, 1.0 };
 
@@ -128,8 +143,8 @@ void SetupRC(bool usenormals, bool usecolor, bool gentexcoords) {
 	glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight);
-	glLightf(GL_LIGHT0,GL_SPOT_CUTOFF,45.0f);
-	glLightf(GL_LIGHT0,GL_SPOT_EXPONENT,10);
+	glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 45.0f);
+	glLightf(GL_LIGHT0, GL_SPOT_EXPONENT, 10);
 
 	glEnable(GL_COLOR_MATERIAL);
 	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
@@ -137,7 +152,7 @@ void SetupRC(bool usenormals, bool usecolor, bool gentexcoords) {
 	glMateriali(GL_FRONT, GL_SHININESS, 128);
 	glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);
 
-	glClearColor(0,0,0,0);
+	glClearColor(0, 0, 0, 0);
 	glerr("SetupRC light");
 	//fog
 	glEnable(GL_FOG);

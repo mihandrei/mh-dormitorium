@@ -27,7 +27,7 @@ typedef struct {
 //deforms the surface with the given pulse, x,y specify where the pulse should be copied, not centered!
 //prevpulse specify the shape of the pulse at t-dt, use to specify speed
 //no bounds check
-void PhysSurf_deform(PhysSurf *self, int x, int y, float A, const Pulse *pulse,
+void PhysSurf_deform(PhysSurf *self, int x, int y, const Pulse *pulse,
 		const Pulse *prevpulse, int additive);
 
 //s t  -1 .. 1
@@ -39,6 +39,6 @@ float Pulse_gauss(float s, float t,float *c);
 float Pulse_modes(float s, float t,int mn_array[2]);
 
 void Pulse__init(Pulse *self, int w, int h);
-void Pulse_init_fromfn(Pulse *self, int w, int h, pulsefn func,void *data);
+void Pulse_fn(Pulse *self,pulsefn func,void *data);
 void Pulse__dispose(Pulse *self);
 #endif /* SURFACEPHYSICS_H_ */
