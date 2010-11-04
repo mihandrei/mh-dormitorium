@@ -1,0 +1,19 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: ChessPlugin Plug-in
+Bundle-SymbolicName: chessPlugin;singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: chessplugin.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: chess,
+ chess.repres.Ox88,
+ chess.repres.Ox88.pieces,
+ chess.search,
+ chess.test,
+ chessplugin,
+ chessplugin.views,
+ chessplugin.widgets,
+ search

@@ -1,0 +1,78 @@
+package chess.test;
+
+import static org.junit.Assert.*;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import chess.repres.Ox88.Board;
+import chess.repres.Ox88.Coordinate;
+import chess.repres.Ox88.RayMoveGenerator;
+import chess.repres.Ox88.pieces.Bishop;
+import chess.repres.Ox88.pieces.King;
+import chess.repres.Ox88.pieces.Knight;
+import chess.repres.Ox88.pieces.Pawn;
+import chess.repres.Ox88.pieces.Queen;
+import chess.repres.Ox88.pieces.Rook;
+
+public class TestRayMoveGenerator {
+
+	Board board;
+
+	byte[] rayDeltas;
+
+	RayMoveGenerator rayGenarator;
+
+	short sourceLocationsOK[] = { 0, 68, 68, 68, 68, 68, 68 };
+
+	short destinationLocationsOK[] = { 16, 66, 17, 4, 53, 70, 119 };
+
+	short sourceLocationsBad[] = { 68, 68, 73, 68 };
+
+	short destinationLocationsBad[] = { 64, 23, 64, 35 };
+
+	@Before
+	public void setUp() throws Exception {
+
+		board = new Board();
+
+		board.add(new Rook(true), new Coordinate("a1"));
+		board.add(new Knight(true), new Coordinate("g3"));
+		board.add(new Bishop(true), new Coordinate("c1"));
+		board.add(new Queen(true), new Coordinate("e5"));
+		board.add(new King(true), new Coordinate("d3"));
+		board.add(new Pawn(true), new Coordinate("b5"));
+
+		rayDeltas = Queen.rayDeltaQueen;
+		rayGenarator = new RayMoveGenerator(rayDeltas);
+		
+		rayGenarator.setBoard(board);
+
+	}
+
+	@Test
+	public void testIsValidMove() {
+		for (int i = 0; i < sourceLocationsOK.length; i++) {
+			System.out.println("coord: (" + sourceLocationsOK[i] + ","
+					+ destinationLocationsOK[i] + ")");
+			assertTrue(rayGenarator.isValidMove(sourceLocationsOK[i],
+					destinationLocationsOK[i]));
+		}
+		for (int i = 0; i < sourceLocationsBad.length; i++) {
+			assertFalse(rayGenarator.isValidMove(sourceLocationsBad[i],
+					destinationLocationsBad[i]));
+		}
+
+	}
+
+	@Test
+	public void testMove() {
+		fail("Not yet implemented");
+	}
+
+	@Test
+	public void testGenerateMoves() {
+		fail("Not yet implemented");
+	}
+
+}

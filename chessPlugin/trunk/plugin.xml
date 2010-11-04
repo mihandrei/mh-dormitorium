@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+
+   <extension
+         id="application"
+         point="org.eclipse.core.runtime.applications">
+      <application>
+         <run
+               class="chessplugin.BiPluginApplication">
+         </run>
+      </application>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="chessplugin.Perspective"
+            id="chessplugin.Perspective"
+            name="Chess">
+      </perspective>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+       <view
+             class="chessplugin.views.ChessView"
+             icon="icons/chess/calutz.gif"
+             id="chessplugin.ChessView"
+             name="ChessView"/>
+       <view
+             class="chessplugin.views.WhiteView"
+             icon="icons/chess/Yellow P.gif"
+             id="chessplugin.WhiteView"
+             name="White">
+       </view>
+       <view
+             class="chessplugin.views.BlackView"
+             icon="icons/chess/Black P.gif"
+             id="chessplugin.BlackView"
+             name="Black">
+       </view>
+       <view
+             class="chessplugin.views.DiagnosticView"
+             id="chessPlugin.DiagnosticView"
+             name="Diagnostic"
+             restorable="true">
+       </view>
+   </extension>
+   <extension
+         id="product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="chessPlugin.application"
+            name="chess">
+         <property
+               name="appName"
+               value="chess">
+         </property>
+      </product>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="chessplugin.handlers.Undo"
+            description="takes back a move"
+            id="chessPlugin.undo"
+            name="Undo">
+      </command>
+      <command
+            defaultHandler="chessplugin.handlers.New"
+            description="starts a new game"
+            id="chessPlugin.newgame"
+            name="new game">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar">
+         <toolbar
+               id="chessPlugin.toolbar1">
+            <command
+                  commandId="chessPlugin.undo"
+                  icon="icons/undo.png"
+                  label="undo"
+                  style="push">
+            </command>
+            <command
+                  commandId="chessPlugin.newgame"
+                  icon="icons/sample.gif"
+                  label="new"
+                  style="push">
+            </command>
+         </toolbar>
+      </menuContribution>
+   </extension>
+
+</plugin>
