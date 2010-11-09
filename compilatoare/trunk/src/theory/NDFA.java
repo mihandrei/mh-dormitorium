@@ -8,12 +8,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-
 import theory.Grammar.Production;
-import tools.GraphViz;
 
 /**
  * varianta neidexata O(n) list<transition> cu transition =
@@ -34,13 +29,13 @@ import tools.GraphViz;
 
 public class NDFA {
 
-	private Set<String> Q = new HashSet<String>();
-	private Set<String> F = new HashSet<String>();;
-	private Set<String> Sigma = new HashSet<String>();;
-	private String q0 = "q0";
-	private String epsilon = "epsilon";
+	public Set<String> Q = new HashSet<String>();
+	public Set<String> F = new HashSet<String>();;
+	public Set<String> Sigma = new HashSet<String>();;
+	public String q0 = "q0";
+	public String epsilon = "epsilon";
 
-	private Map<String, Map<String, Set<String>>> transitions = new HashMap<String, Map<String, Set<String>>>();
+	public Map<String, Map<String, Set<String>>> transitions = new HashMap<String, Map<String, Set<String>>>();
 
 	// starile curente ale automatului epsilon closed
 	private Set<String> currentStateSet = new HashSet<String>();
@@ -262,42 +257,19 @@ public class NDFA {
 		
 		return builder.toString();		
 	}
-	
-	public void show() {
-		StringBuilder dot = new StringBuilder();
-		dot.append( "digraph dfa {\n" + "rankdir=LR;\n" + "size=\"12\";\n"
-				+ "ranksep = 1.5\n;" + "nodesep = .25;\n" + "\"\" [shape=none]");
 
-		for (String state : Q) {
-			String shape = F.contains(state) ? "doublecircle" : "circle";
-			dot.append( String.format("\"%s\" [shape=%s];\n", state, shape));
+	public static NDFA parse(String ndfa_s) {
+	    NDFA ndfa = new NDFA();
+		ndfa_s = ndfa_s.replace(" ", "");
+		String[] ss = ndfa_s.split("\n");
+		String[] fs = ss[1].split(",");
+		for(int i=2;i<ss.length;i++){
+			String[] pr = ss[i].split("->");
+			String[] al =  pr[0].split(",");
+			String[] ar = pr[1].split(",");
+			ndfa.add(al[0],al[1],ar);
 		}
-
-		dot.append( String.format("\"\" -> \"%s\"\n", q0));
-
-		for (String state : Q) {
-			Map<String, Set<String>> symtran = transitions.get(state);
-			for (String sym : symtran.keySet()) {
-				for (String dest : symtran.get(sym)) {
-					dot.append( String.format("\"%s\" -> \"%s\" [label=\"%s\"];\n ",
-							state, dest, sym));
-				}
-			}
-		}
-		dot.append("}");
-
-		final byte[] imgdata = new GraphViz().getGraph(dot.toString());
-
-		java.awt.EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				ImageIcon ico = new ImageIcon(imgdata);
-				JLabel lbl = new JLabel(ico);
-				JFrame frm = new JFrame();
-				frm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-				frm.add(lbl);
-				frm.pack();
-				frm.setVisible(true);
-			}
-		});
+		ndfa.build(ss[0], fs);
+		return ndfa;		
 	}
 }

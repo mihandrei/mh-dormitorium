@@ -1,5 +1,7 @@
 package theory;
 
+import theory.ui.Viz;
+
 public class NDFATest {
 	static void test1(){
 		NDFA ndfa = new NDFA();
@@ -9,9 +11,9 @@ public class NDFATest {
 		ndfa.add("3", "a", "1","2");
 		ndfa.build("0", "1");
 		System.out.println(ndfa.isDeterministic());
-		ndfa.show();
+		Viz.show(ndfa);
 		NDFA dfa = ndfa.convert2DFA();
-		dfa.show();				
+		Viz.show(dfa);			
 		System.out.println(dfa.isDeterministic());
 	}
 	
@@ -27,10 +29,10 @@ public class NDFATest {
 		ndfa.add("3", "b", "2","3","4");		
 		ndfa.build("0", "1");
 		System.out.println(ndfa.isDeterministic());
-		ndfa.show();
+		Viz.show(ndfa);
 		NDFA dfa = ndfa.convert2DFA();
 		System.out.println(dfa.isDeterministic());
-		dfa.show();				
+		Viz.show(dfa);		
 	}
 	
 
@@ -43,32 +45,32 @@ public class NDFATest {
 		ndfa.add("3", "epsilon", "2");
 		ndfa.build("0", "1");
 		System.out.println(ndfa.isDeterministic());
-		ndfa.show();
+		Viz.show(ndfa);
 		NDFA dfa = ndfa.convert2DFA();
 		System.out.println(dfa.isDeterministic());
-		dfa.show();				
+		Viz.show(dfa);			
 	}
 	
 	static void test_grammar2NDFA() throws Exception{		
 		Grammar grammar = SimpleGrammarParser.parseSimple("S->aS; S->aX; X->bS; X->aY; Y->bS; S->a ");
 		NDFA ndfa = grammar.toNDFA();
-		ndfa.show();
+		Viz.show(ndfa);
 		NDFA dfa = ndfa.convert2DFA();
 		System.out.println(dfa.isDeterministic());
-		dfa.show();	
+		Viz.show(dfa);	
 	}
 	
 	static void test_grammar2NDFA2grammar() throws Exception {
 		Grammar grammar = SimpleGrammarParser.parseSimple("S->aS; S->aX; X->bS; X->aY; Y->bS; S->a ");
 		NDFA ndfa = grammar.toNDFA();
-		ndfa.show();
+		Viz.show(ndfa);
 		NDFA dfa = ndfa.convert2DFA();
-		dfa.show();
+		Viz.show(dfa);
 		
 		System.out.println(dfa.toGrammar());
 	}
 	public static void main(String[] args) throws Exception {
-		test_grammar2NDFA2grammar();
+			test1();
 	}
 
 }
