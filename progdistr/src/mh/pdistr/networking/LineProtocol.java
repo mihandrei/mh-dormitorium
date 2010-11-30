@@ -43,7 +43,7 @@ public abstract class LineProtocol implements Runnable {
 
 	public LineProtocol(Socket socket) {
 		this.socket = socket;
-		this.log = Logger.getLogger(getClass().getName() + "." + socket.getRemoteSocketAddress());
+		this.log = Logger.getLogger("mh.pdist."+getClass().getSimpleName() + "." + socket.getRemoteSocketAddress());
 	}
 
 	private void open_connection() throws IOException {

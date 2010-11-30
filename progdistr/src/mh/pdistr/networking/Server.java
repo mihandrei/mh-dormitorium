@@ -20,7 +20,7 @@ public class Server {
 	 * logs to log4j. logger name is TCP_srv_.nameoftheprotocolclass
 	 */
 	public static void listenTCP(int port, ProtocolFactory protofact) {
-		Logger log = Logger.getLogger("TCP_srv."+protofact.getClass().getName());
+		Logger log = Logger.getLogger("mh.pdist."+"TCP_srv."+protofact.getClass().getSimpleName());
 		ExecutorService pool = Executors.newFixedThreadPool(NTHREADS);
 		try {
 			log.info("threadpool of " + NTHREADS

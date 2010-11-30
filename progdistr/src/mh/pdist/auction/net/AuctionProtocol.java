@@ -5,7 +5,13 @@ import java.util.Map;
 
 import mh.pdist.auction.model.Bet;
 import mh.pdistr.networking.JsonFrameProtocol;
-
+/**
+ * frames
+ * {"frame":"join","msg":{"userid":"mihai"}}
+ * {"frame":"bet","msg":{"auctionID":1, "round":0,"ammount":130}}
+ * @author miha
+ *
+ */
 public class AuctionProtocol extends JsonFrameProtocol {
 	private enum PState  {DISSCONNECTED, CONNECTED, IN_AUCTION }
 	private PState state = PState.DISSCONNECTED;
