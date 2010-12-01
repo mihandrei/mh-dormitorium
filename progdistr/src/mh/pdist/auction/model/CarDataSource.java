@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.json.simple.parser.ParseException;
+
 /**
  * data stored in a file nice to do : make this into a mini database engine 1)
  * make access to file rows fast (store seek jumps at the beginning of the
@@ -29,13 +31,13 @@ import java.util.Set;
 
 public class CarDataSource {
 	//indexes the cars by id
-	public HashMap<Integer, Car> carindex = new HashMap<Integer, Car>();
+	public HashMap<Long, Car> carindex = new HashMap<Long, Car>();
 	//index by model
-	HashMap<String, Set<Integer>> model2id_index = new HashMap<String, Set<Integer>>();
+	HashMap<String, Set<Long>> model2id_index = new HashMap<String, Set<Long>>();
 	
 	private String filename;
 
-	public CarDataSource(String filename) throws IOException {
+	public CarDataSource(String filename) throws IOException, ParseException {
 		this.filename = filename;
 		if (new File(filename).exists()) {
 			readfrom(new FileInputStream(filename));
@@ -49,7 +51,7 @@ public class CarDataSource {
 	/**
 	 * a o(1) operation that retrieves all the cars with the same model
 	 */
-	public Set<Integer> getByModel(String model) {
+	public Set<Long> getByModel(String model) {
 		return model2id_index.get(model);
 	}
 
@@ -60,7 +62,7 @@ public class CarDataSource {
 		carindex.put(c.id, c);
 		
 		if(!model2id_index.containsKey(c.model)){
-			model2id_index.put(c.model,new HashSet<Integer>());
+			model2id_index.put(c.model,new HashSet<Long>());
 		}
 		model2id_index.get(c.model).add(c.id);
 	}
@@ -86,7 +88,7 @@ public class CarDataSource {
 					.forName("UTF-8")));
 
 			for (Car c : carindex.values()) {
-				writer.println(c.asString());				
+				writer.println(c.asJsonString());				
 			}
 
 		} finally {
@@ -95,7 +97,7 @@ public class CarDataSource {
 		}
 	}
 
-	private void readfrom(InputStream is) throws IOException {
+	private void readfrom(InputStream is) throws IOException, ParseException {
 		carindex.clear();
 		BufferedReader reader = null;
 
@@ -105,7 +107,7 @@ public class CarDataSource {
 
 			String line = null;
 			while ((line = reader.readLine()) != null) {
-				Car c = Car.fromStr(line);
+				Car c = Car.fromJsonStr(line);
 				carindex.put(c.id, c);
 			}
 
