@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="PdistNetworking" default="usage" basedir=".">
+	<description>
+		Build file for the auction server and client
+		They are distributed together but this build file can be easily split in 2. 		
+	</description>
+
+	<property name="classes.dir" value="classes" />
+	<property name="src.dir" value="src" />
+	<property name="dist.dir" value="dist" />
+	<property name="lib.dir" value="lib" />
+
+	<property name="srv.dist.jar" value="srv.jar" />
+	<property name="srv.main.class" value="mh.pdist.auction.net.srv.Main" />
+	<property name="srv.port" value="4444" />
+	
+	<property name="cli.dist.jar" value="cli.jar" />
+	<property name="cli.main.class" value="mh.pdist.auction.net.client.ClientUI" />
+
+	<pathconvert property="libs" pathsep=" ">
+		<mapper>
+			<chainedmapper>
+				<flattenmapper />
+			</chainedmapper>
+		</mapper>
+
+		<path id="project.class.path">
+			<fileset dir="${lib.dir}" includes="**/*.jar" />
+		</path>
+	</pathconvert>
+
+
+	<target name="clean" description="cleans output directory">
+		<delete dir="${classes.dir}" />
+	</target>
+
+	<target name="compile-srv" description="compile the sources">
+		<mkdir dir="${classes.dir}" />
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="project.class.path" debug="true" target="1.6">
+			<include name="mh/pdist/networking/**" />
+			<include name="mh/pdist/auction/model/**" />
+			<include name="mh/pdist/auction/net/srv/**" />
+		</javac>
+	</target>
+
+	<target name="compile-cli" description="compile the sources">
+		<mkdir dir="${classes.dir}" />
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="project.class.path" debug="true" target="1.6">
+			<include name="mh/pdist/networking/**" />
+			<include name="mh/pdist/auction/model/**" />
+			<include name="mh/pdist/auction/net/client/**" />
+		</javac>
+	</target>
+
+	<target name="dist-srv" depends="compile-srv" description="jar the server">
+		<mkdir dir="${dist.dir}" />
+
+		<copy todir="${classes.dir}">
+			<fileset dir="resources">
+			</fileset>
+		</copy>
+
+		<jar basedir="${classes.dir}" destfile="${dist.dir}/${srv.dist.jar}">
+			<manifest>
+				<attribute name="Main-Class" value="${srv.main.class}" />
+				<attribute name="Class-Path" value="${libs}" />
+			</manifest>
+		</jar>
+
+		<copy todir="${dist.dir}">
+			<fileset dir="${lib.dir}">
+				<include name="**/*.jar" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="dist-cli" depends="compile-cli" description="jar the client">
+		<mkdir dir="${dist.dir}" />
+		<copy todir="${classes.dir}">
+			<fileset dir="resources">
+			</fileset>
+		</copy>
+
+		<jar basedir="${classes.dir}" destfile="${dist.dir}/${cli.dist.jar}">
+			<manifest>
+				<attribute name="Main-Class" value="${cli.main.class}" />
+				<attribute name="Class-Path" value="${libs}" />
+			</manifest>
+		</jar>
+
+		<copy todir="${dist.dir}">
+			<fileset dir="${lib.dir}">
+				<include name="**/*.jar" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="run-srv" depends="dist-srv" description="runs the server">
+		<java fork="true" jar="${dist.dir}/${srv.dist.jar}">
+			<arg value="${srv.port}" />
+		</java>
+	</target>
+
+	<target name="run-cli" depends="dist-cli" description="runs the client">
+		<java fork="true" jar="${dist.dir}/${cli.dist.jar}">
+			<arg value="-Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel" />
+		</java>
+	</target>
+
+	<target name="usage" description="display usage information">
+		<echo message="ant run-srv will start the server" />
+		<echo message="ant run-cli will start a client" />
+	</target>
+
+
+</project>
