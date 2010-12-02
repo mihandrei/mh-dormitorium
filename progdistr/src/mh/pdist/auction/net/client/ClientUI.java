@@ -1,5 +1,9 @@
 package mh.pdist.auction.net.client;
 
+import java.awt.Font;
+import java.awt.TrayIcon.MessageType;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
@@ -7,7 +11,11 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultCaret;
+
+import mh.pdist.auction.model.Car;
 
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
@@ -23,9 +31,11 @@ public class ClientUI extends javax.swing.JFrame {
 
     /** Creates new form ClientFrame */
     public ClientUI() {
+    	setLocationByPlatform(true);     //swing puts all windows at 0,0 by default ignoring the system        
         initComponents();
         DefaultCaret caret = (DefaultCaret)jTextArea1.getCaret();
-        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);        
+        ammountTextField.requestFocus();        
     }
 
     /** This method is called from within the constructor to
@@ -35,72 +45,87 @@ public class ClientUI extends javax.swing.JFrame {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">
     private void initComponents() {
-    	   submitbetBtn = new javax.swing.JButton();
-           ammountTextField = new javax.swing.JTextField();
-           infolabel = new javax.swing.JLabel();
-           jScrollPane1 = new javax.swing.JScrollPane();
-           jTextArea1 = new javax.swing.JTextArea();
+    	 ammountTextField = new javax.swing.JTextField();
+         submitbetBtn = new javax.swing.JButton();
+         jScrollPane1 = new javax.swing.JScrollPane();
+         jTextArea1 = new javax.swing.JTextArea();
+         jScrollPane2 = new javax.swing.JScrollPane();
+         jTextArea2 = new javax.swing.JTextArea();
 
-           setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-           submitbetBtn.setText("login");
-           submitbetBtn.addActionListener(new java.awt.event.ActionListener() {
-               public void actionPerformed(java.awt.event.ActionEvent evt) {
-                   submitbetBtnActionPerformed(evt);
-               }
-           });
+         ammountTextField.addActionListener(new java.awt.event.ActionListener() {
+             public void actionPerformed(java.awt.event.ActionEvent evt) {
+                 ammountTextFieldActionPerformed(evt);
+             }
+         });
 
-           infolabel.setBackground(new java.awt.Color(220, 220, 220));
-           infolabel.setFont(new java.awt.Font("DejaVu Sans", 0, 12)); // NOI18N
-           infolabel.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-           infolabel.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-           infolabel.setOpaque(true);
-           infolabel.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
+         submitbetBtn.setText("login");
+         submitbetBtn.addActionListener(new java.awt.event.ActionListener() {
+             public void actionPerformed(java.awt.event.ActionEvent evt) {
+                 submitbetBtnActionPerformed(evt);
+             }
+         });
 
-           jTextArea1.setBackground(new java.awt.Color(254, 254, 254));
-           jTextArea1.setColumns(20);
-           jTextArea1.setEditable(false);
-           jTextArea1.setFont(new java.awt.Font("Courier New", 0, 12)); // NOI18N
-           jTextArea1.setRows(5);
-           jScrollPane1.setViewportView(jTextArea1);
+         jTextArea1.setBackground(new java.awt.Color(254, 254, 254));
+         jTextArea1.setColumns(20);
+         jTextArea1.setEditable(false);
+         jTextArea1.setFont(new java.awt.Font(Font.MONOSPACED, 0, 12)); // NOI18N
+         jTextArea1.setLineWrap(true);
+         jTextArea1.setRows(5);
+         jTextArea1.setTabSize(4);
+         jScrollPane1.setViewportView(jTextArea1);
 
-           javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-           getContentPane().setLayout(layout);
-           layout.setHorizontalGroup(
-               layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addGroup(layout.createSequentialGroup()
-                   .addContainerGap()
-                   .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                       .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 909, Short.MAX_VALUE)
-                       .addComponent(infolabel, javax.swing.GroupLayout.DEFAULT_SIZE, 909, Short.MAX_VALUE)
-                       .addGroup(layout.createSequentialGroup()
-                           .addComponent(ammountTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 858, Short.MAX_VALUE)
-                           .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                           .addComponent(submitbetBtn)))
-                   .addContainerGap())
-           );
-           layout.setVerticalGroup(
-               layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                   .addContainerGap()
-                   .addComponent(infolabel, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
-                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                   .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 241, Short.MAX_VALUE)
-                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                   .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                       .addComponent(submitbetBtn)
-                       .addComponent(ammountTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                   .addContainerGap())
-           );
+         jTextArea2.setColumns(20);         
+         jTextArea2.setEditable(false);
+         jTextArea1.setFont(new java.awt.Font(Font.MONOSPACED, 0, 12)); // NOI18N
+         jTextArea2.setLineWrap(true);
+         jTextArea2.setRows(5);
+         jTextArea1.setTabSize(4);
+         jScrollPane2.setViewportView(jTextArea2);
 
-           pack();
+         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+         getContentPane().setLayout(layout);
+         layout.setHorizontalGroup(
+             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                 .addContainerGap()
+                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                     .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 630, Short.MAX_VALUE)
+                     .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 630, Short.MAX_VALUE)
+                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                         .addComponent(ammountTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 579, Short.MAX_VALUE)
+                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                         .addComponent(submitbetBtn)))
+                 .addContainerGap())
+         );
+         layout.setVerticalGroup(
+             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                 .addContainerGap()
+                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
+                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 285, Short.MAX_VALUE)
+                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                     .addComponent(submitbetBtn)
+                     .addComponent(ammountTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                 .addContainerGap())
+         );
+
+         pack();
+         
     }// </editor-fold>
 
+    private void ammountTextFieldActionPerformed(java.awt.event.ActionEvent evt) {
+    	submitbetBtnActionPerformed(null);
+    }
     private void submitbetBtnActionPerformed(java.awt.event.ActionEvent evt) {
     	String str = ammountTextField.getText().trim();
     	if(!str.equals("")){
 	    	if(clientproto.needs_login()){
 	    		clientproto.login(str);
+	    		setTitle(str);
 	    	}else{
 	    		long ammount = Long.parseLong(str);
 	    		clientproto.placeBet(ammount);
@@ -114,7 +139,8 @@ public class ClientUI extends javax.swing.JFrame {
     */
     public static void main(String args[]) {
     	final ClientUI mainframe = new ClientUI();
-    	TextAppender appender = mainframe.new TextAppender();
+    	TextAppender appender = mainframe.new TextAppender();    	    
+    	
     	appender.setThreshold(Level.INFO);
     	
     	Logger.getRootLogger().addAppender(appender);
@@ -135,6 +161,7 @@ public class ClientUI extends javax.swing.JFrame {
     }
     
     private AuctionClientProtocol clientproto ;
+    
     private void startNetClient(){
     	Logger log = Logger.getLogger("mh.client");
     	String host = "localhost";
@@ -145,7 +172,46 @@ public class ClientUI extends javax.swing.JFrame {
 		try {
 			sock = new Socket(host,port);
 			clientproto = new AuctionClientProtocol(sock);
-			new Thread(clientproto,"auct-cli").start();
+			
+			 clientproto.on_connlost_event(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {			
+						java.awt.EventQueue.invokeLater(new Runnable() {					
+							@Override
+							public void run() {					
+								JOptionPane.showMessageDialog(ClientUI.this, "connection lost",
+										"",JOptionPane.WARNING_MESSAGE);
+								System.exit(0);
+							}
+						});
+					}
+			});
+			 clientproto.on_auctionStart_event(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {			
+						java.awt.EventQueue.invokeLater(new Runnable() {					
+							@Override
+							public void run() {		
+								Car car = clientproto.get_auction().car;
+								jTextArea2.setText(String.format(
+								  "Producer\t: %s \nModel\t: %s \nColor \t:%s \nPrice\t:%s", 
+								  car.producer , car.model, car.color,car.price));								
+							}
+						});
+					}
+				});
+			 clientproto.on_auctionStop_event(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {			
+						java.awt.EventQueue.invokeLater(new Runnable() {					
+							@Override
+							public void run() {					
+								jTextArea2.setText("");					
+							}
+						});
+					}
+				});
+			new Thread(clientproto,"auct-cli").start();			
 		} catch (UnknownHostException e) {			
 			log.fatal("connection failed",e);
 		} catch (IOException e) {
@@ -153,13 +219,12 @@ public class ClientUI extends javax.swing.JFrame {
 		}           
     }
 
-    // Variables declaration - do not modify
     private javax.swing.JTextField ammountTextField;
-    private javax.swing.JLabel infolabel;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JTextArea jTextArea2;
     private javax.swing.JButton submitbetBtn;
-    // End of variables declaration
     
     private List<String> logbuffer = new ArrayList<String>(100);
     
@@ -170,7 +235,7 @@ public class ClientUI extends javax.swing.JFrame {
 
     private class TextAppender extends AppenderSkeleton{    	
     	public TextAppender(){
-    		layout = new PatternLayout("%d{ABSOLUTE} %-5.5p [%12.12t] %-40.40c{5}: %m%n");
+    		layout = new PatternLayout("%-5.5p [%4.12t] %-10.30c{5}: %m%n");
     	}
     	@Override
     	protected void append(LoggingEvent event) {

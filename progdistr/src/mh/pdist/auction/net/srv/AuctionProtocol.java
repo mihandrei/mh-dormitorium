@@ -67,7 +67,7 @@ public class AuctionProtocol extends JsonFrameProtocol {
 				factory.broadcastInfo(userid + " joined");
 				log.info(userid +" joined");
 			}else{
-				sendErrorFrame("expected join frame");
+				sendErrorFrame("expected join frame got "+frameName);
 			}
 			break;
 		case JOINED:
@@ -78,7 +78,7 @@ public class AuctionProtocol extends JsonFrameProtocol {
 				factory.postBet(bet);
 				sendFrame(BET_CONFIRMED_FRAME, "");
 			}else{
-				sendErrorFrame("expected bet frame");
+				sendErrorFrame("expected bet frame got "+frameName);
 			}
 			break;		
 		}

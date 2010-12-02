@@ -68,6 +68,7 @@ public abstract class LineProtocol implements Runnable {
 
 				// begin processing input
 				while ((inputLine = in.readLine()) != null) {
+					log.debug("recv "+ inputLine);
 					on_line_recieved(inputLine);
 				}
 			} finally { // processing is done; try to close what we can
@@ -84,8 +85,8 @@ public abstract class LineProtocol implements Runnable {
 
 	public void sendLine(String line) {
 		synchronized (out) {
-			log.debug(line);
 			out.println(line);
+			log.debug("sent "+ line);
 		}
 
 	}

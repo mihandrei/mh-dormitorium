@@ -103,7 +103,7 @@
 
 	<target name="run-cli" depends="dist-cli" description="runs the client">
 		<java fork="true" jar="${dist.dir}/${cli.dist.jar}">
-			<arg value="-Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel" />
+			<jvmarg value="-Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel"/>			
 		</java>
 	</target>
 

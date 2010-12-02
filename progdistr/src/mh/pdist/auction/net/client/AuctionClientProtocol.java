@@ -1,5 +1,6 @@
 package mh.pdist.auction.net.client;
 
+import java.awt.event.ActionListener;
 import java.net.Socket;
 import java.util.Map;
 
@@ -26,11 +27,16 @@ public class AuctionClientProtocol extends JsonFrameProtocol {
 	
 	private String userid;
 	private Auction c_auction;
+	private ActionListener conCloseEvent,auctionStartEvent,auctionStopEvent;
 	
 	public synchronized String getUserid() {
 		return userid;
-	}	
-
+	}
+	
+	public synchronized  Auction get_auction() {
+		return c_auction;
+	}
+	
 	public AuctionClientProtocol(Socket socket) {
 		super(socket);
 	}
@@ -40,6 +46,7 @@ public class AuctionClientProtocol extends JsonFrameProtocol {
 		log.info("conn lost");
 		if(state != PState.DISSCONNECTED){
 			state = PState.DISSCONNECTED;
+			conCloseEvent.actionPerformed(null);
 		}
 	}
 
@@ -64,29 +71,31 @@ public class AuctionClientProtocol extends JsonFrameProtocol {
 		switch(state){
 		case CONNECTED:			
 			if(frameName.equals(JOINED_FRAME)){										
-				state = PState.JOINED;				
+				state = PState.JOINED;							
 				log.info("join confirmed");				
 			}else{
-				sendErrorFrame("expected join confirmation");
+				sendErrorFrame("expected join confirmation got "+ frameName);
 			}
 			break;
 		case JOINED:
 			if(frameName.equals(AUCTION_STARTED_FRAME)){
 				c_auction = Auction.fromMap((Map<String, Object>) msg);
-				log.info("auction started: " + c_auction);
+				log.info("auction started: " + msg);
+				auctionStartEvent.actionPerformed(null);
 				state = PState.IN_AUCTION;
 			}			
-			
+			break;
 		case IN_AUCTION:
-			if(frameName.equals(AUCTION_CLOSED_FRAME)){
-				log.info("auction closed");
+			if(frameName.equals(AUCTION_CLOSED_FRAME)){				
+				log.info("auction closed "+msg);
 				c_auction = null;
+				auctionStopEvent.actionPerformed(null);
 				state= PState.JOINED;
 			}			
 			else if(frameName.equals(BET_CONFIRMED_FRAME)){									
 				log.info("bet placed");
 			}else{
-				sendErrorFrame("expected bet confirmation");
+				sendErrorFrame("expected bet confirmation  got "+ frameName);
 			}
 			break;		
 		}		
@@ -107,8 +116,18 @@ public class AuctionClientProtocol extends JsonFrameProtocol {
 
 	public synchronized void login(String str) {
 		sendFrame(JOIN_FRAME, str);
-		
+		userid = str;
 	}
-		
+	
+	public void on_connlost_event(ActionListener actionListener) {
+		conCloseEvent = actionListener;
+	}
+	public void on_auctionStart_event(ActionListener actionListener) {
+		auctionStartEvent = actionListener;
+	}
+	public void on_auctionStop_event(ActionListener actionListener) {
+		auctionStopEvent = actionListener;
+	}
+	
 }
 

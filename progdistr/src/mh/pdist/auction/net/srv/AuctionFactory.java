@@ -35,7 +35,7 @@ import org.apache.log4j.Logger;
  */
 public class AuctionFactory implements ProtocolFactory {
 	private static final int MIN_PARTICIPANTS = 2;
-	private static final long AUCTION_CLOSE_TIMEOUT = 5;
+	private static final long AUCTION_CLOSE_TIMEOUT = 10;
 	
 	private Map<String, AuctionProtocol> connections = new HashMap<String, AuctionProtocol>();
 	private AuctionProcessor auctionProcessor;
@@ -71,6 +71,14 @@ public class AuctionFactory implements ProtocolFactory {
 				proto.sendInfoFrame(message);
 			}
 		}
+	}
+	
+	private void close_connections() {
+		synchronized (connections) {
+			for (AuctionProtocol proto : connections.values()) {
+				proto.loseConnection();
+			}
+		}	
 	}
 
 	public void postBet(Bet bet) {
@@ -188,6 +196,7 @@ public class AuctionFactory implements ProtocolFactory {
 
 						try {
 							auction.acceptBet(bet);
+							broadcastInfo("accepted bet "+ bet.asMap() );
 						} catch (InvalidBetException e) {
 							synchronized (connections) {
 								AuctionProtocol con = connections.get(bet.usrid);
@@ -214,6 +223,7 @@ public class AuctionFactory implements ProtocolFactory {
 			}
 			
 			broadcastInfo("actions finished. Bye");
+			close_connections();
 
 		}		
 
